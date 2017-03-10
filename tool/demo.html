@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rangyinputs jQuery plugin demo</title>
+    <link href="demo.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="https://raw.githubusercontent.com/timdown/rangyinputs/master/rangyinputs-jquery-src.js"></script>
+    <style type="text/css">
+        p.inputcontainer {
+            float: left;
+            background-color: lightsteelblue;
+            border: solid 1px darkblue;
+            padding: 0.3125em;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            var $ta = $("#ta");
+            var $startIndex = $("#startIndex"), $endIndex = $("#endIndex");
+
+            function reportSelection() {
+                var sel = $ta.getSelection();
+                $startIndex.text(sel.start);
+                $endIndex.text(sel.end);
+            }
+
+            $ta.on("selectionchange", reportSelection);
+            $ta.on("keyup mouseup", reportSelection);
+
+
+            reportSelection();
+
+            $("input").mousedown(function(e) {
+                //e.preventDefault();
+
+                switch (this.name) {
+                    case "surroundSelectedText":
+                        $ta.surroundSelectedText("<arg>", "</arg>");
+                        break;
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript">
+     
+     function saveTextAsFile() {
+      var textToWrite = document.getElementById('ta');
+      var textFileAsBlob = new Blob([ textToWrite ], { type: 'text/plain' });
+      var fileNameToSaveAs = "temp.anno";
+
+      var downloadLink = document.createElement("a");
+      downloadLink.download = fileNameToSaveAs;
+      downloadLink.innerHTML = "Download File";
+      if (window.webkitURL != null) {
+        // Chrome allows the link to be clicked without actually adding it to the DOM.
+        downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+      } else {
+        // Firefox requires the link to be added to the DOM before it can be clicked.
+        downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+        downloadLink.onclick = destroyClickedElement;
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+      }
+
+      downloadLink.click();
+    }
+
+
+    function destroyClickedElement(event) {
+      // remove the link from the DOM
+      document.body.removeChild(event.target);
+    }
+
+    
+    function destroyClickedElement(event)
+    {
+        document.body.removeChild(event.target);
+    }
+     
+    function loadFileAsText()
+    {
+        var fileToLoad = document.getElementById("fileToLoad").files[0];
+     
+        var fileReader = new FileReader();
+        fileReader.onload = function(fileLoadedEvent) 
+        {
+            var textFromFileLoaded = fileLoadedEvent.target.result;
+            document.getElementById("ta").value = textFromFileLoaded;
+        };
+        fileReader.readAsText(fileToLoad, "UTF-8");
+    }
+     
+    </script>
+</head>
+<body>
+<h1>Argument Span Annotate</h1>
+
+<p class="inputcontainer">
+    
+    <input type="button" class="unselectable" unselectable="on" name="surroundSelectedText" value="surround selected text">
+
+
+    <br>
+    Selection: <b id="startIndex"></b> to <b id="endIndex"></b>
+    
+    <br>
+    <textarea rows="60" cols="180" id="ta">Some test text
+        That has
+
+        Some line breaks, including some trailing ones
+
+
+    </textarea>
+
+    <br>
+    <button type="button" onclick="saveTextAsFile()" value="save" id="save">Save</button>
+
+    <br>
+    <input type="file" id="fileToLoad">
+    <button onclick="loadFileAsText()">Load Selected File</button>
+</p>
+
+</body>
+</html>
